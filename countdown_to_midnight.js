@@ -9,11 +9,18 @@ function runner() {
   const minInMs = 1000 * 60
   const hourInMs = minInMs * 60
   const dayInMs = hourInMs * 24
-  // Create a timer that updates every second
+  // Create a timer to update the time
+  let prev = undefined
   let timer = setInterval(function() {
-    var now = new Date().getTime()
-    let distance = targetTime - now
-    let hours = Math.floor((distance % dayInMs) / hourInMs)
+    const now = new Date().getTime()
+    const distance = targetTime - now
+    // Ensure to only update every second
+    const rounded = now - (now % 1000)
+    if (prev === rounded) {
+      return
+    }
+    prev = rounded 
+    const hours = Math.floor((distance % dayInMs) / hourInMs)
     let minutes = Math.floor((distance % hourInMs) / minInMs)
     let seconds = Math.floor((distance % minInMs) / 1000)
     if (hours > 0 && minutes > 0 && seconds < 10) seconds = `0${seconds}`
@@ -27,12 +34,13 @@ function runner() {
       time = `${seconds} ${seconds == 1 ? 'second' : 'seconds'}`
     }
     // Update the element with id="countdown"
-    let e = document.getElementById("countdown")
-    e.innerHTML = `${time} to midnight`
+    const e = document.getElementById("countdown")
+    e.innerHTML = `${time} to midnight`      
+    // e.innerHTML = new Date(now).toISOString()
     if (distance <= 0) {
       clearInterval(timer)
     }
-  }, 1000)
+  }, 300)
 }
 let html = `
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
